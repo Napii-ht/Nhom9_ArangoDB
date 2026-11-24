@@ -130,11 +130,10 @@ def print_benchmark(
     ket_qua
 ):
 
-    print("\n========================================")
     print("DATASET:", ten_dataset)
     print("Số đỉnh:", so_dinh)
     print("Số cạnh:", so_canh)
-    print("========================================")
+
 
     print(
         "Python Dijkstra:",
