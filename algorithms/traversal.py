@@ -28,22 +28,22 @@ def bfs(g, start, max_depth=None):
 def dfs(g, start):
     """Duyệt DFS từ start. Trả về (order, parent)."""
     order = []
-    parent = {start: None}
+    parent = {}
     visited = set()
-    nganxep = [start]
+    nganxep = [(start, None)]
 
     while nganxep:
-        dinh = nganxep.pop()
+        dinh, cha = nganxep.pop()
         if dinh in visited:
             continue
 
         visited.add(dinh)
+        parent[dinh] = cha
         order.append(dinh)
 
         for ke, _ in reversed(g.get(dinh, [])):
-            if ke not in visited and ke not in parent:
-                parent[ke] = dinh
-                nganxep.append(ke)
+            if ke not in visited:
+                nganxep.append((ke, dinh))
 
     return order, parent
 
@@ -101,4 +101,27 @@ def find_cycles(g):
             visit(dinh)
 
     return cycles
+    
+def find_shell_transfers(g, source, target, shell_nodes,
+                         max_depth=4, min_weight=0):
+    """BFS tìm các đường chuyển tiền source, target chỉ đi qua
+    công ty bình phong. Trả về danh sách đường đi."""
+    hangdoi = deque([(source, [source])])
+    results = []
 
+    while hangdoi:
+        dinh, path = hangdoi.popleft()
+        if len(path) - 1 >= max_depth:
+            continue
+
+        for ke, w in g.get(dinh, []):
+            if w < min_weight or ke in path:
+                continue
+            if ke == target:
+                if len(path) > 1:  
+                    results.append(path + [ke])
+                continue
+            if ke in shell_nodes:
+                hangdoi.append((ke, path + [ke]))
+
+    return results
