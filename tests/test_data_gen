@@ -1,0 +1,22 @@
+from algorithms.traversal import find_cycles
+from data_gen import build_graph, generate, shell_set
+from detectors import detect_shell_transfers
+
+
+def test_planted_patterns_are_detected():
+    companies, edges, planted = generate(100, 300, seed=1)
+    g = build_graph(companies, edges)
+
+    cycles = find_cycles(g)
+    assert len(cycles) == 1
+    assert set(cycles[0][:-1]) == set(planted.cycles[0])
+
+    chains = detect_shell_transfers(g, shell_set(companies))
+    assert planted.shell_chains[0] in chains
+
+
+def test_hidden_link_has_no_direct_edge():
+    companies, edges, planted = generate(100, 300, seed=1)
+    g = build_graph(companies, edges)
+    x, y = planted.hidden_links[0]
+    assert y not in [n for n, _ in g[x]]
